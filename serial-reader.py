@@ -15,20 +15,25 @@ with serial.Serial('/dev/ttyACM0') as s:
     try:
       for _ in range(200):
         data += [int(s.readline())]
-      # data = data[-5000:]
+      data = data[-20000:]
 
-      """
+      ax1 = plt.subplot(2, 1, 1)
+      ax2 = plt.subplot(2, 1, 2)
+
+      plt.sca(ax1) # Set current axes
       fourier = np.fft.rfft(data)
-      plt.plot(np.fft.rfftfreq(len(data), 0.002), abs(fourier))
+      plt.plot(np.fft.rfftfreq(len(data), 0.001), abs(fourier))
       plt.xlim(0, 3)
-      plt.ylim(0, 800000)
-      """
-      smoothed = moving_average(data, 40)
-      # plt.plot(np.arange(0, len(smoothed)/500, 1/500), smoothed)
+      plt.ylim(0, 400000)
+
+      plt.sca(ax2) # Set current axes
+      smoothed = moving_average(data, 20)
+      #plt.plot(np.arange(0, len(smoothed)/500, 1/500), smoothed)
       plt.plot(smoothed)
-      plt.ylim(-200, 4096)
+      # plt.ylim(-200, 4096)
+
       plt.pause(0.0001)
-      plt.cla()
+      plt.clf()
 
     except KeyboardInterrupt:
       with open('data.csv', 'w') as f:
