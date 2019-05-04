@@ -11,36 +11,36 @@ def moving_average(a, n=3):
     return ret[n - 1 :] / n
 
 
+chunk_size = 12
+num_chunks = 60
+chunks_to_drop = 1
+
 with serial.Serial("/dev/ttyACM0") as s:
+    for _ in range(chunks_to_drop * chunk_size):
+        s.readline()
+
     data = []
     while True:
-        try:
-            for _ in range(200):
-                data += [int(s.readline())]
-            dataToShow = data[-3000:]
+        for _ in range(chunk_size):
+            data += [int(s.readline())]
+        dataToShow = data[-(chunk_size * num_chunks) :]
 
-            ax1 = plt.subplot(2, 1, 1)
-            ax2 = plt.subplot(2, 1, 2)
+        ax1 = plt.subplot(2, 1, 1)
+        ax2 = plt.subplot(2, 1, 2)
 
-            plt.sca(ax1)  # Set current axes
-            fourier = np.fft.rfft(dataToShow)
-            plt.plot(np.fft.rfftfreq(len(dataToShow), 0.001), abs(fourier))
-            plt.xlim(0, 3)
-            plt.ylim(0, 400000)
+        plt.sca(ax1)  # Set current axes
+        fourier = np.fft.rfft(dataToShow)
+        plt.plot(np.fft.rfftfreq(len(dataToShow), 0.001), abs(fourier))
+        plt.xlim(0, 3)
+        plt.ylim(0, 400000)
 
-            plt.sca(ax2)  # Set current axes
-            smoothed = moving_average(dataToShow, 150)
-            # plt.plot(np.arange(0, len(smoothed)/500, 1/500), smoothed)
-            plt.plot(smoothed)
-            # plt.ylim(-200, 4096)
+        plt.sca(ax2)  # Set current axes
+        smoothed = moving_average(dataToShow, 150)
+        # plt.plot(np.arange(0, len(smoothed)/500, 1/500), smoothed)
+        plt.plot(smoothed)
+        # plt.ylim(-200, 4096)
 
-            plt.pause(0.0001)
-            plt.clf()
-
-        except KeyboardInterrupt:
-            with open("data.csv", "w") as f:
-                for x in data:
-                    f.write(str(x) + "\n")
-            break
+        plt.pause(0.01)
+        plt.clf()
 
 plt.show()
