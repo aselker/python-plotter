@@ -11,8 +11,8 @@ def moving_average(a, n=3):
     return ret[n - 1 :] / n
 
 
-chunk_size = 12
-num_chunks = 60
+chunk_size = 60
+num_chunks = 12
 chunks_to_drop = 1
 
 with serial.Serial("/dev/ttyACM0") as s:
@@ -35,7 +35,7 @@ with serial.Serial("/dev/ttyACM0") as s:
         plt.ylim(0, 400000)
 
         plt.sca(ax2)  # Set current axes
-        smoothed = moving_average(dataToShow, 150)
+        smoothed = moving_average(dataToShow, 1)
         # plt.plot(np.arange(0, len(smoothed)/500, 1/500), smoothed)
         plt.plot(smoothed)
         # plt.ylim(-200, 4096)
