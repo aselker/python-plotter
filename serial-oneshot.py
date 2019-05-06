@@ -26,20 +26,18 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     return y
 
 
-"""
-chunk_size = 60
-num_chunks = 20
-chunks_to_drop = 1
-"""
-chunk_size = 1
-num_chunks = None
-chunks_to_drop = 0
+drop_begin = 200
+drop_end = 0
 freq = 450  # Hz
 
 with serial.Serial("/dev/ttyACM0", timeout=1) as s:
     s.write(b"G")
     lines = s.readlines()
     data = [int(l) for l in lines]
+    if drop_end:
+        data = data[drop_begin:-drop_end]
+    else:
+        data = data[drop_begin:]
 
 ax1 = plt.subplot(2, 1, 1)
 ax2 = plt.subplot(2, 1, 2)
@@ -55,8 +53,8 @@ plt.sca(ax1)  # Set current axes
 fourier = np.fft.rfft(data)
 # fourier = np.fft.rfft(smoothed)
 plt.plot(np.fft.rfftfreq(len(data), 1 / freq), abs(fourier))
-plt.xlim(0, 5)
-plt.ylim(0, 10000)
+plt.xlim(0, 6)
+plt.ylim(0, 1e5)
 
 
 plt.show()
