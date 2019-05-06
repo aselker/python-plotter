@@ -29,30 +29,33 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
 drop_begin = 200
 drop_end = 0
 freq = 450  # Hz
+smoothed_drop_begin = 200
 
 with serial.Serial("/dev/ttyACM0", timeout=1) as s:
     s.write(b"G")
     lines = s.readlines()
-    data = [int(l) for l in lines]
+    ys = [int(l) for l in lines]
     if drop_end:
-        data = data[drop_begin:-drop_end]
+        ys = ys[drop_begin:-drop_end]
     else:
-        data = data[drop_begin:]
+        ys = ys[drop_begin:]
+
+xs = np.arange(0, len(ys) / freq, 1 / freq)
 
 ax1 = plt.subplot(2, 1, 1)
 ax2 = plt.subplot(2, 1, 2)
 
 plt.sca(ax2)  # Set current axes
-smoothed = butter_lowpass_filter(data, 10, freq)
-# plt.plot(smoothed[200:])
-plt.plot(np.arange(0, len(data) / freq, 1 / freq), data)
+plt.plot(xs, ys)
+smoothed = butter_lowpass_filter(ys, 10, freq)
+plt.plot(xs[smoothed_drop_begin:], smoothed[smoothed_drop_begin:])
 # plt.xlim(120, len(smoothed))
 # plt.ylim(700, 800)
 
 plt.sca(ax1)  # Set current axes
-fourier = np.fft.rfft(data)
+fourier = np.fft.rfft(ys)
 # fourier = np.fft.rfft(smoothed)
-plt.plot(np.fft.rfftfreq(len(data), 1 / freq), abs(fourier))
+plt.plot(np.fft.rfftfreq(len(ys), 1 / freq), abs(fourier))
 plt.xlim(0, 6)
 plt.ylim(0, 1e5)
 
