@@ -45,19 +45,34 @@ xs = np.arange(0, len(ys) / freq, 1 / freq)
 ax1 = plt.subplot(2, 1, 1)
 ax2 = plt.subplot(2, 1, 2)
 
-plt.sca(ax2)  # Set current axes
-plt.plot(xs, ys)
+plt.sca(ax1)  # Set current axes
+plt.plot(xs, ys, label="Raw")
 smoothed = butter_lowpass_filter(ys, 10, freq)
-plt.plot(xs[smoothed_drop_begin:], smoothed[smoothed_drop_begin:])
+plt.plot(xs[smoothed_drop_begin:], smoothed[smoothed_drop_begin:], label="Smoothed")
 # plt.xlim(120, len(smoothed))
 # plt.ylim(700, 800)
 
-plt.sca(ax1)  # Set current axes
+plt.title("Signal")
+plt.xlabel("Time (s)")
+plt.ylabel("Light (/4096)")
+plt.grid(True)
+ax1.legend()
+
+
+plt.sca(ax2)  # Set current axes
 fourier = np.fft.rfft(ys)
-# fourier = np.fft.rfft(smoothed)
 plt.plot(np.fft.rfftfreq(len(ys), 1 / freq), abs(fourier))
-plt.xlim(0, 6)
-plt.ylim(0, 1e5)
+"""
+fourier_smoothed = np.fft.rfft(smoothed)
+plt.plot(np.fft.rfftfreq(len(smoothed), 1 / freq), abs(fourier_smoothed))
+"""
+plt.xlim(0, 4)
+plt.ylim(0, 2e4)
+plt.title("Fourier Transform")
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Amplitude")
+plt.grid(True)
+ax1.legend()
 
 
 plt.show()
