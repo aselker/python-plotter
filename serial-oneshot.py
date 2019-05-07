@@ -40,7 +40,9 @@ with serial.Serial("/dev/ttyACM0", timeout=1) as s:
     else:
         ys = ys[drop_begin:]
 
-xs = np.arange(0, len(ys) / freq, 1 / freq)
+xs = np.arange(
+    0, len(ys) / freq - 0.000001, 1 / freq
+)  # Subtract a small number to avoid rounding issues
 
 ax1 = plt.subplot(2, 1, 1)
 ax2 = plt.subplot(2, 1, 2)
